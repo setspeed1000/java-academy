@@ -113,11 +113,12 @@
 
   function writeFile(path, text) { cheerpjAddStringFile(path, enc.encode(text)); }
 
-  async function javac(files, outDir) {
+  async function javac(files, outDir, silent) {
     capture.textContent = '';
-    const code = await cheerpjRunMain('com.sun.tools.javac.Main', CP, ...files,
-      '-d', outDir || '/files/', '-cp', '/str/none/', '-encoding', 'UTF-8', '-nowarn');
+    const args = [...files, '-d', outDir || '/files/', '-cp', '/str/none/', '-encoding', 'UTF-8', '-nowarn'];
+    const code = await cheerpjRunMain('com.sun.tools.javac.Main', CP, ...args);
     await settle();
+    if (!silent) logRaw('javac ' + args.join(' '), capture.textContent, code);
     return { ok: code === 0, text: capture.textContent };
   }
 
@@ -134,7 +135,23 @@
     const exit = await cheerpjRunMain(cls, CP);
     await settle();
     if (obs) { obs.disconnect(); mirrorTo.textContent = capture.textContent; }
+    logRaw('java ' + cls + (cls === 'Check' ? '   (hidden checker tests)' : ''), capture.textContent, exit);
     return { exit, text: capture.textContent };
+  }
+
+  // Unedited record of every step in the last run.
+  let rawLog = [];
+  function logRaw(cmd, text, exit) {
+    rawLog.push('$ ' + cmd + '\n' + text + (text && !text.endsWith('\n') ? '\n' : '') + '[exit code ' + exit + ']');
+    $('rawOut').textContent = rawLog.join('\n\n');
+  }
+  function setRaw(on) {
+    state.raw = !!on; save();
+    $('rawBtn').setAttribute('aria-pressed', String(state.raw));
+    $('rawBtn').classList.toggle('on', state.raw);
+    $('rawOut').hidden = !state.raw;
+    ['out', 'explain'].forEach(id => { $(id).hidden = state.raw; });
+    $('paneOutput').classList.toggle('raw-mode', state.raw);
   }
 
   // Load the engine and compile a throwaway program so the first real Run is fast.
@@ -144,7 +161,7 @@
       await initJvm();
       setStatus('busy', 'Warming up the compiler…');
       writeFile('/str/Warm.java', 'public class Warm { public static void main(String[] a) { } }');
-      await javac(['/str/Warm.java'], '/files/warm/');
+      await javac(['/str/Warm.java'], '/files/warm/', true);
     }).then(() => { if (!running) setStatus('ok', 'Ready'); })
       .catch(e => engineFailed(e));
   }
@@ -170,11 +187,13 @@
     $('explain').innerHTML = '';
     $('banner').hidden = true;
     $('out').classList.remove('has-error');
+    rawLog = [];
+    $('rawOut').textContent = '(Run your code to see the raw output of every step.)';
   }
 
   function showCompileErrors(text) {
     const errs = Explain.compile(text).filter(e => e.file === 'Main');
-    $('out').textContent = text.replace(/\/str\//g, '').trim();
+    $('out').textContent = text;
     $('out').classList.add('has-error');
     if (!errs.length) return;
     errs.forEach(e => markLine(e.line));
@@ -272,7 +291,7 @@
         longRunTimer = setTimeout(() => setStatus('busy', 'Still running… if this never ends you may have an infinite loop. Reload the page; your code is saved.'), 7000);
         const res = await java('Main', $('out'));
         clearTimeout(longRunTimer);
-        if (!res.text.trim()) $('out').innerHTML = '<span class="muted">(Your program ran but printed nothing.)</span>';
+        const printedNothing = !res.text;
         showRuntimeError(res.text);
 
         const runInfo = { code, compiled: true, output: res.text, harnessCompiled: false, harnessOutput: '' };
@@ -284,7 +303,8 @@
           if (hc.ok) runInfo.harnessOutput = (await java('Check')).text;
           else runInfo.harnessHint = 'The checker couldn\'t use your code. Make sure it is written exactly as: ' + ex.harness.signature;
         }
-        setStatus('ok', 'Finished in ' + ((performance.now() - started) / 1000).toFixed(1) + ' s');
+        setStatus('ok', 'Finished in ' + ((performance.now() - started) / 1000).toFixed(1) + ' s' +
+          (res.exit ? ', exit code ' + res.exit : '') + (printedNothing ? ', no output' : ''));
         finish(ex, runInfo);
       });
     } catch (e) {
@@ -400,6 +420,8 @@
   makeEditor();
 
   $('runBtn').onclick = run;
+  $('rawBtn').onclick = () => setRaw(!state.raw);
+  setRaw(state.raw);
   $('menuBtn').onclick = openDrawer;
   $('closeDrawer').onclick = closeDrawer;
   $('scrim').onclick = closeDrawer;

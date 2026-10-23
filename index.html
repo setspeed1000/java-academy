@@ -71,10 +71,12 @@
     <div class="pane-head">
       <div class="file-tab">Output</div>
       <div class="status" id="status"><span class="dot"></span><span id="statusText">Starting Java…</span></div>
+      <button class="btn ghost small toggle" id="rawBtn" aria-pressed="false" title="Show every step's unedited output">Raw</button>
     </div>
     <div class="output-scroll">
       <div class="banner" id="banner" hidden></div>
       <pre class="console" id="out"></pre>
+      <pre class="console raw-log" id="rawOut" hidden></pre>
       <div class="explain" id="explain"></div>
     </div>
   </section>
