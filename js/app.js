@@ -363,6 +363,8 @@
     $('hintBox').hidden = true;
     $('hintBox').innerHTML = ex.hint || '';
     $('hintBtn').textContent = 'Get a hint';
+    $('solutionBox').hidden = true;
+    $('solutionBtn').textContent = 'View solution';
     renderTasks();
     updateHelp();
 
@@ -432,12 +434,28 @@
     const h = $('hintBox'); h.hidden = !h.hidden;
     $('hintBtn').textContent = h.hidden ? 'Get a hint' : 'Hide hint';
   };
-  $('solutionBtn').onclick = () => {
-    if (confirm('Replace your code with the solution? Your current code will be overwritten.')) {
-      editor.setValue(current.solution); persistCode();
-      if (isMobile()) setTab('code');
+  let solutionView = null;
+  function showSolution(on) {
+    $('solutionBox').hidden = !on;
+    $('solutionBtn').textContent = on ? 'Hide solution' : 'View solution';
+    if (!on) return;
+    if (!solutionView) {
+      if (window.CodeMirror) {
+        solutionView = CodeMirror($('solutionCode'), {
+          mode: 'text/x-java', theme: 'academy', lineNumbers: true, readOnly: 'nocursor',
+          viewportMargin: Infinity, tabSize: 4
+        });
+      } else {
+        const pre = document.createElement('pre');
+        $('solutionCode').appendChild(pre);
+        solutionView = { setValue: v => { pre.textContent = v; }, refresh: () => {} };
+      }
     }
-  };
+    solutionView.setValue(current.solution);
+    setTimeout(() => solutionView.refresh(), 0);
+    $('solutionBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  $('solutionBtn').onclick = () => showSolution($('solutionBox').hidden);
   $('resetBtn').onclick = () => {
     if (confirm('Reset this exercise to the starter code?')) { editor.setValue(current.starter); persistCode(); clearOutput(); }
   };

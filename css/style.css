@@ -171,6 +171,18 @@ code { font-family: var(--mono); font-size: 0.88em; }
   background: rgba(111, 179, 242, 0.08); border: 1px solid rgba(111, 179, 242, 0.25); font-size: 14px;
 }
 
+.solution {
+  margin-top: 10px; border: 1px solid rgba(242, 153, 74, 0.35); border-radius: 7px; overflow: hidden;
+}
+.solution-head {
+  padding: 7px 12px; font-size: 13px; font-weight: 600;
+  background: rgba(242, 153, 74, 0.1); border-bottom: 1px solid rgba(242, 153, 74, 0.25);
+}
+.solution-head .muted { font-weight: 400; margin-left: 4px; }
+.solution-code .CodeMirror { height: auto; font: 13px/1.55 var(--mono); }
+.solution-code .CodeMirror-cursors { display: none; }
+.solution-code pre { margin: 0; padding: 10px 12px; background: var(--code-bg); font: 13px/1.55 var(--mono); overflow-x: auto; }
+
 .learn-nav {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 10px 14px; border-top: 1px solid var(--line); background: var(--panel); flex-shrink: 0;
