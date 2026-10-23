@@ -162,9 +162,10 @@ Serial.println("fast");
 <tr><td><code>char</code></td><td>one character, single quotes</td><td><code>char mode = 'X';</code></td></tr>
 <tr><td><code>String</code></td><td>text, double quotes</td><td><code>String team = "Titans";</code></td></tr>
 </table>
-<p>Two Arduino quirks: printing a <code>float</code> shows <strong>2 decimal places</strong> by default, and printing a <code>bool</code> shows <code>1</code> for true and <code>0</code> for false.</p>`,
+<p>Two Arduino quirks: printing a <code>float</code> shows <strong>2 decimal places</strong> by default, and printing a <code>bool</code> shows <code>1</code> for true and <code>0</code> for false.</p>
+<p>You may also see <code>double</code> (on an Uno it's identical to <code>float</code>) and <code>boolean</code> (Arduino's older name for <code>bool</code>). Both work.</p>`,
     tasks: [
-      { text: 'Create a decimal variable <strong>price</strong> holding 4.99', tests: [{ type: 'code', pattern: '\\bfloat\\s+price\\s*=\\s*4\\.99\\s*;', msg: 'Missing a float variable named price holding 4.99.' }] },
+      { text: 'Create a decimal variable <strong>price</strong> holding 4.99', tests: [{ type: 'code', pattern: '\\b(float|double)\\s+price\\s*=\\s*4\\.99\\s*;', msg: 'Missing a decimal variable (float or double) named price holding 4.99.' }] },
       { text: 'Create a true/false variable <strong>inStock</strong> holding true', tests: [{ type: 'code', pattern: '\\bbool(ean)?\\s+inStock\\s*=\\s*true\\s*;', msg: 'Missing a bool variable named inStock holding true.' }] },
       { text: 'Create a single-character variable <strong>grade</strong> holding the letter A', tests: [{ type: 'code', pattern: "\\bchar\\s+grade\\s*=\\s*'A'\\s*;", msg: 'Missing a char variable named grade holding A. A char uses single quotes.' }] },
       { text: 'Create a text variable <strong>board</strong> holding Uno', tests: [{ type: 'code', pattern: '\\bString\\s+board\\s*=\\s*"Uno"\\s*;', msg: 'Missing a String variable named board holding Uno.' }] },
