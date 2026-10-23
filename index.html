@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java Academy</title>
+<meta name="description" content="Learn Java from zero with lessons, a real compiler in your browser, and instant auto-checking.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f2994a'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='%23141820'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="icon-btn" id="menuBtn" aria-label="All lessons" title="All lessons">
+    <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="brand"><span class="logo">J</span><span class="brand-name">Java Academy</span></div>
+  <div class="crumb" id="crumb"></div>
+  <div class="progress-wrap" title="Exercises completed">
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-text" id="progressText">0 / 0</span>
+  </div>
+</header>
+
+<main class="workspace" id="workspace" data-tab="learn">
+  <!-- LEARN -->
+  <section class="pane pane-learn" id="paneLearn">
+    <div class="learn-scroll">
+      <div class="unit-label" id="unitLabel"></div>
+      <h1 id="exTitle"></h1>
+      <div class="learn-body" id="learnBody"></div>
+
+      <div class="instructions" id="instructionsBox">
+        <h2>Instructions</h2>
+        <ol class="tasks" id="taskList"></ol>
+        <div class="help-row">
+          <button class="text-btn" id="hintBtn">Get a hint</button>
+          <button class="text-btn" id="solutionBtn" hidden>View solution</button>
+        </div>
+        <div class="hint" id="hintBox" hidden></div>
+      </div>
+    </div>
+    <nav class="learn-nav">
+      <button class="btn ghost" id="prevBtn">Back</button>
+      <span class="ex-count" id="exCount"></span>
+      <button class="btn" id="nextBtn">Next</button>
+    </nav>
+  </section>
+
+  <!-- CODE -->
+  <section class="pane pane-code" id="paneCode">
+    <div class="pane-head">
+      <div class="file-tab">Main.java</div>
+      <div class="head-actions">
+        <button class="btn ghost small" id="resetBtn" title="Reset to starter code">Reset</button>
+        <button class="btn run" id="runBtn" title="Run (Ctrl+Enter)">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>
+          <span>Run</span>
+        </button>
+      </div>
+    </div>
+    <div class="editor-host" id="editorHost"></div>
+  </section>
+
+  <!-- OUTPUT -->
+  <section class="pane pane-output" id="paneOutput">
+    <div class="pane-head">
+      <div class="file-tab">Output</div>
+      <div class="status" id="status"><span class="dot"></span><span id="statusText">Starting Java…</span></div>
+    </div>
+    <div class="output-scroll">
+      <div class="banner" id="banner" hidden></div>
+      <pre class="console" id="out"></pre>
+      <div class="explain" id="explain"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar" id="tabbar">
+  <button data-tab="learn" class="active">Learn</button>
+  <button data-tab="code">Code</button>
+  <button data-tab="output">Output <span class="tab-dot" id="outDot" hidden></span></button>
+</nav>
+
+<!-- Lesson drawer -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <span>Course</span>
+    <button class="icon-btn" id="closeDrawer" aria-label="Close">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <button class="text-btn danger" id="resetAll">Reset all progress</button>
+    <p class="credit">Java runs in your browser via <a href="https://cheerpj.com" target="_blank" rel="noopener">CheerpJ</a> by Leaning Technologies.</p>
+  </div>
+</aside>
+
+<!-- CheerpJ capture targets (hidden) -->
+<pre id="console" class="cj-capture" aria-hidden="true"></pre>
+<div id="cjDisplay" class="cj-capture" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+<script src="https://cjrtnc.leaningtech.com/4.3/loader.js"></script>
+<script src="js/checker.js"></script>
+<script src="js/lessons.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
