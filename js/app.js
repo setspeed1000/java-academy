@@ -301,7 +301,7 @@
           const hc = await javac(['/str/Main.java', '/str/Check.java']);
           runInfo.harnessCompiled = hc.ok;
           if (hc.ok) runInfo.harnessOutput = (await java('Check')).text;
-          else runInfo.harnessHint = 'The checker couldn\'t use your code. Make sure it is written exactly as: ' + ex.harness.signature;
+          else runInfo.harnessHint = 'The checker couldn\'t find what it needs. It\'s looking for ' + ex.harness.signature + '. Check the names, capitals and types.';
         }
         setStatus('ok', 'Finished in ' + ((performance.now() - started) / 1000).toFixed(1) + ' s' +
           (res.exit ? ', exit code ' + res.exit : '') + (printedNothing ? ', no output' : ''));
